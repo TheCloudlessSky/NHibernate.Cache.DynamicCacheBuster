@@ -70,7 +70,7 @@ don't have to manually bust the cache.
 model changes) manually, you can use the `cache.region_prefix` setting. However,
 it has the same problem as cach region names for each model.
 
-- This project is very similar to to how 
+- This project is similar to how 
 [Shopify's IdentityCache](https://github.com/Shopify/identity_cache) does cache
 key generation for Ruby on Rails.
 
