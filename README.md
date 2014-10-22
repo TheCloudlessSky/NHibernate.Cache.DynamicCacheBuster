@@ -74,6 +74,12 @@ it has the same problem as cach region names for each model.
 [Shopify's IdentityCache](https://github.com/Shopify/identity_cache) does cache
 key generation for Ruby on Rails.
 
+## Future
+
+- Figure out an easy way to generate the DB schema for the model/collection
+so that we don't have to serialize the whole `RootClass` or `Collection` mapping
+objects.
+
 ## Changelog
 
 **1.0.0**
