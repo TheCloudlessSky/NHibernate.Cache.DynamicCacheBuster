@@ -1,5 +1,4 @@
-NHibernate.Cache.DynamicCacheBuster
-===================================
+# NHibernate.Cache.DynamicCacheBuster
 
 Caching in NHibernate is awesome. But, what happens if your schema changes
 and your cache isn't cleared? For example, if you practice hot compatibility
@@ -30,7 +29,7 @@ version for busting? Uh-oh... :boom:
 This project fixes that problem by computing a hash of the schema so that you
 don't have to manually bust the cache.
 
-# Usage
+## Usage
 
 1. Install the package:
 
@@ -63,7 +62,7 @@ don't have to manually bust the cache.
     }
     ```
 
-# Extras
+## Extras
 
 - This project also computes hashes for collection caches.
 
@@ -75,7 +74,7 @@ it has the same problem as cach region names for each model.
 [Shopify's IdentityCache](https://github.com/Shopify/identity_cache) does cache
 key generation for Ruby on Rails.
 
-# Changelog
+## Changelog
 
 **1.0.0**
 - Initial release :sparkles:.
