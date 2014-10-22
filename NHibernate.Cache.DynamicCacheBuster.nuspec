@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>NHibernate.Cache.DynamicCacheBuster</id>
+    <version>1.0.0-alpha1</version>
+    <authors>Adrian Phinney</authors>
+    <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>http://github.com/TheCloudlessSky/NHibernate.Cache.DynamicCacheBuster</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Automatically bust your NHibernate cache when the schema changes.</description>
+    <!--<releaseNotes></releaseNotes>-->
+    <copyright>Copyright Harbour Inc. 2014</copyright>
+    <tags>nhibernate caching</tags>
+    <dependencies>
+      <dependency id="NHibernate" version="[3.3,)" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="NHibernate.Cache.DynamicCacheBuster\bin\Release\NHibernate.Cache.DynamicCacheBuster.dll" target="lib\net40" />
+    <file src="NHibernate.Cache.DynamicCacheBuster\bin\Release\NHibernate.Cache.DynamicCacheBuster.pdb" target="lib\net40" />
+    <file src="NHibernate.Cache.DynamicCacheBuster\bin\Release\NHibernate.Cache.DynamicCacheBuster.xml" target="lib\net40" />
+  </files>
+</package>
