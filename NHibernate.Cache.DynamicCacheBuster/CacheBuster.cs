@@ -101,7 +101,7 @@ namespace NHibernate.Cache.DynamicCacheBuster
             }
 
             // Queue setting the cache region name so that setting the region 
-            // name doesn't change the hash of the object.
+            // name doesn't interfere with changing the hash of the object.
             foreach (var item in setCacheRegionNameQueue)
             {
                 item();
