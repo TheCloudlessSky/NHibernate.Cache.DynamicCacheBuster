@@ -150,10 +150,10 @@ namespace NHibernate.Cache.DynamicCacheBuster
             // This is the standard enumeration done for the EntityMetamodel
             // constructor to build *all* properties (including properties that
             // refer to collections).
-            var serialized = new List<Tuple<string, IType>>(rootClass.PropertyClosureSpan);
+            var serialized = new List<Tuple<string, string>>(rootClass.PropertyClosureSpan);
             foreach (var property in rootClass.PropertyClosureIterator)
             {
-                serialized.Add(Tuple.Create(property.Name, property.Type));
+                serialized.Add(Tuple.Create(property.Name, property.Type.ToString()));
             }
 
             return serialized;
@@ -161,7 +161,7 @@ namespace NHibernate.Cache.DynamicCacheBuster
 
         public static object DefaultCollectionSerializer(Collection collection)
         {
-            var serialized = Tuple.Create(collection.Role, collection.CollectionType, collection.Element.Type);
+            var serialized = Tuple.Create(collection.Role, collection.CollectionType.ToString(), collection.Element.Type.ToString());
             return serialized;
         }
 

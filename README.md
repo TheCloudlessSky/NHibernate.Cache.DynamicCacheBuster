@@ -76,6 +76,10 @@ key generation for Ruby on Rails.
 
 ## Changelog
 
+**1.1.1**
+- Change default hash input functions to use type names instead of serializing
+  the whole type. 
+
 **1.1.0**
 - Add logging: `buster.WithLogging(Logger)`
 - Add customization for `RootClass` hash input: `buster.WithRootClassHashInput(GetRootClassHashInput)`
