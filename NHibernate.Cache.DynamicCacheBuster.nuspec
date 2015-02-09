@@ -16,8 +16,11 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="NHibernate.Cache.DynamicCacheBuster\bin\Release\NHibernate.Cache.DynamicCacheBuster.dll" target="lib\net40" />
-    <file src="NHibernate.Cache.DynamicCacheBuster\bin\Release\NHibernate.Cache.DynamicCacheBuster.pdb" target="lib\net40" />
-    <file src="NHibernate.Cache.DynamicCacheBuster\bin\Release\NHibernate.Cache.DynamicCacheBuster.xml" target="lib\net40" />
+    <file src="NHibernate.Cache.DynamicCacheBuster\bin\Release\NHibernate.Cache.DynamicCacheBuster.dll" target="lib\net45" />
+    <file src="NHibernate.Cache.DynamicCacheBuster\bin\Release\NHibernate.Cache.DynamicCacheBuster.pdb" target="lib\net45" />
+    <file src="NHibernate.Cache.DynamicCacheBuster\bin\Release\NHibernate.Cache.DynamicCacheBuster.xml" target="lib\net45" />
+    <file src="NHibernate.Cache.DynamicCacheBuster.Net40\bin\Release\NHibernate.Cache.DynamicCacheBuster.dll" target="lib\net40" />
+    <file src="NHibernate.Cache.DynamicCacheBuster.Net40\bin\Release\NHibernate.Cache.DynamicCacheBuster.pdb" target="lib\net40" />
+    <file src="NHibernate.Cache.DynamicCacheBuster.Net40\bin\Release\NHibernate.Cache.DynamicCacheBuster.xml" target="lib\net40" />
   </files>
 </package>
