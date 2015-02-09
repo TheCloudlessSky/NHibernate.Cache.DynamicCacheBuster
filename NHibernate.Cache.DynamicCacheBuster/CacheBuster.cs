@@ -10,11 +10,69 @@ using NHibernate.Cfg;
 namespace NHibernate.Cache.DynamicCacheBuster
 {
     using Action = System.Action;
+    using Tuple = System.Tuple;
     using RootClass = NHibernate.Mapping.RootClass;
     using Collection = NHibernate.Mapping.Collection;
+    using Component = NHibernate.Mapping.Component;
+    using IType = NHibernate.Type.IType;
 
     public class CacheBuster
     {
+        private Logger logger = DefaultLogger;
+        private GetRootClassHashInput getRootClassHashInput = DefaultRootClassSerializer;
+        private GetCollectionHashInput getCollectionHashInput = DefaultCollectionSerializer;
+
+        public CacheBuster()
+        {
+
+        }
+
+        /// <summary>
+        /// Set the logger.
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <returns></returns>
+        public CacheBuster WithLogger(Logger logger)
+        {
+            if (logger == null) throw new ArgumentNullException("logger");
+            this.logger = logger;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the delegate used to get an object that will be used as the
+        /// input to the hash function for each <see cref="NHibernate.Mapping.RootClass"/>.
+        /// By default, a collection of all properties (including collection 
+        /// properties) by name and type is used.
+        /// </summary>
+        /// <param name="getHashInput"></param>
+        /// <returns></returns>
+        public CacheBuster WithRootClassHashInput(GetRootClassHashInput getHashInput)
+        {
+            if (getHashInput == null) throw new ArgumentNullException("getHashInput");
+            this.getRootClassHashInput = getHashInput;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the delegate used to get an object that will be used as the
+        /// input to the hash function for each <see cref="NHibernate.Mapping.Collection"/>.
+        /// By default, the role, collection type and element type are used.
+        /// </summary>
+        /// <param name="getHashInput"></param>
+        /// <returns></returns>
+        public CacheBuster WithCollectionHashInput(GetCollectionHashInput getHashInput)
+        {
+            if (getHashInput == null) throw new ArgumentNullException("serializer");
+            this.getCollectionHashInput = getHashInput;
+            return this;
+        }
+
+        /// <summary>
+        /// Generate and apply the hashed version to each cache region for
+        /// classes and collections.
+        /// </summary>
+        /// <param name="configuration"></param>
         public void AppendVersionToCacheRegionNames(Configuration configuration)
         {
             // When configuration.BuildSessionFactory() is called, it'll run 
@@ -22,20 +80,18 @@ namespace NHibernate.Cache.DynamicCacheBuster
             // hash *before* BuildSessionFactory(), it will override the 
             // collection mapping region names. Therefore, always pre-build the
             // mappings so that they're fully compiled and can have their cache
-            // region name set without bein overridden.
+            // region name set without being overridden.
             configuration.BuildMappings();
 
             var setCacheRegionNameQueue = new Queue<Action>();
 
             using (var hashAlgorithm = new MD5CryptoServiceProvider())
             {
-                foreach (var classMapping in configuration.ClassMappings)
+                // NOTE: Only RootClasses and Collections are supported with caching.
+
+                foreach (var rootClassMapping in configuration.ClassMappings.OfType<RootClass>())
                 {
-                    var rootClassMapping = classMapping as RootClass;
-                    if (rootClassMapping != null)
-                    {
-                        AppendComputedVersion(rootClassMapping, hashAlgorithm, setCacheRegionNameQueue);
-                    }
+                    AppendComputedVersion(rootClassMapping, hashAlgorithm, setCacheRegionNameQueue);
                 }
 
                 foreach (var collectionMapping in configuration.CollectionMappings)
@@ -52,31 +108,64 @@ namespace NHibernate.Cache.DynamicCacheBuster
             }
         }
 
-        private void AppendComputedVersion(RootClass classMapping, HashAlgorithm hashAlgorithm, Queue<Action> actionQueue)
+        private void AppendComputedVersion(RootClass rootClass, HashAlgorithm hashAlgorithm, Queue<Action> actionQueue)
         {
-            var isCacheDisabled = String.IsNullOrEmpty(classMapping.CacheConcurrencyStrategy);
+            var isCacheDisabled = String.IsNullOrEmpty(rootClass.CacheConcurrencyStrategy);
             if (isCacheDisabled) return;
 
-            var hash = Hash(hashAlgorithm, classMapping);
+            var hashInput = getRootClassHashInput(rootClass);
+            var hash = Hash(hashAlgorithm, hashInput);
 
             actionQueue.Enqueue(() =>
-                classMapping.CacheRegionName = classMapping.CacheRegionName + "(" + hash + ")"
-            );
+            {
+                var cacheRegionName = rootClass.CacheRegionName;
+                logger(cacheRegionName, hash);
+                rootClass.CacheRegionName = cacheRegionName + "(" + hash + ")";
+            });
         }
 
-        private void AppendComputedVersion(Collection collectionMapping, HashAlgorithm hashAlgorithm, Queue<Action> actionQueue)
+        private void AppendComputedVersion(Collection collection, HashAlgorithm hashAlgorithm, Queue<Action> actionQueue)
         {
-            var isCacheDisabled = String.IsNullOrEmpty(collectionMapping.CacheConcurrencyStrategy);
+            var isCacheDisabled = String.IsNullOrEmpty(collection.CacheConcurrencyStrategy);
             if (isCacheDisabled) return;
 
-            var hash = Hash(hashAlgorithm, collectionMapping);
+            var hashInput = getCollectionHashInput(collection);
+            var hash = Hash(hashAlgorithm, hashInput);
 
             actionQueue.Enqueue(() =>
-                collectionMapping.CacheRegionName = collectionMapping.CacheRegionName + "(" + hash + ")"
-            );
+            {
+                var cacheRegionName = collection.CacheRegionName;
+                logger(cacheRegionName, hash);
+                collection.CacheRegionName = cacheRegionName + "(" + hash + ")";
+            });
         }
 
-        private string Hash(HashAlgorithm hashAlgorithm, object input)
+        private static void DefaultLogger(string cacheRegionName, string hash)
+        {
+
+        }
+
+        public static object DefaultRootClassSerializer(RootClass rootClass)
+        {
+            // This is the standard enumeration done for the EntityMetamodel
+            // constructor to build *all* properties (including properties that
+            // refer to collections).
+            var serialized = new List<Tuple<string, IType>>(rootClass.PropertyClosureSpan);
+            foreach (var property in rootClass.PropertyClosureIterator)
+            {
+                serialized.Add(Tuple.Create(property.Name, property.Type));
+            }
+
+            return serialized;
+        }
+
+        public static object DefaultCollectionSerializer(Collection collection)
+        {
+            var serialized = Tuple.Create(collection.Role, collection.CollectionType, collection.Element.Type);
+            return serialized;
+        }
+
+        private static string Hash(HashAlgorithm hashAlgorithm, object input)
         {
             var formatter = new BinaryFormatter();
             using (var memoryStream = new MemoryStream())

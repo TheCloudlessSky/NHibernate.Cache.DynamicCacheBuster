@@ -29,7 +29,11 @@ namespace NHibernate.Cache.DynamicCacheBuster.Sample
             var cfg = SetupNHibernateConfiguration();
             
             // The magic!
-            new CacheBuster()
+            new CacheBuster() 
+                .WithLogger((cacheRegionName, hash) =>
+                {
+                    Console.WriteLine("Region = {0}\r\n  Hash = {1}\r\n---", cacheRegionName, hash);
+                })
                 .AppendVersionToCacheRegionNames(cfg);
 
             var sessionFactory = SetupDatabaseAndCreateSessionFactory(cfg);
