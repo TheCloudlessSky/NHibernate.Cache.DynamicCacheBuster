@@ -68,19 +68,21 @@ don't have to manually bust the cache.
 
 - If you want to bust *all* of your model's caches (in addition to individual
 model changes) manually, you can use the `cache.region_prefix` setting. However,
-it has the same problem as cach region names for each model.
+it has the same problem as cache region names for each model.
 
 - This project is similar to how 
 [Shopify's IdentityCache](https://github.com/Shopify/identity_cache) does cache
 key generation for Ruby on Rails.
 
-## Future
-
-- Figure out an easy way to generate the DB schema for the model/collection
-so that we don't have to serialize the whole `RootClass` or `Collection` mapping
-objects.
-
 ## Changelog
+
+**1.1.0**
+- Add logging: `buster.WithLogging(Logger)`
+- Add customization for `RootClass` hash input: `buster.WithRootClassHashInput(GetRootClassHashInput)`
+- Add customization for `Collection` hash input: `buster.WithCollectionHashInput(GetCollectionHashInput)`
+- Better hashing of `RootClass` that only looks at all properties (including
+  collections and reference properties).
+- .NET 4.0 and 4.5 packages.
 
 **1.0.0**
 - Initial release :sparkles:.
