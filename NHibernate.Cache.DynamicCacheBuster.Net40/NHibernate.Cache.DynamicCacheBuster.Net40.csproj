@@ -65,8 +65,8 @@
     <Compile Include="..\NHibernate.Cache.DynamicCacheBuster\GetRootClassHashInput.cs">
       <Link>GetRootClassHashInput.cs</Link>
     </Compile>
-    <Compile Include="..\NHibernate.Cache.DynamicCacheBuster\Logger.cs">
-      <Link>Logger.cs</Link>
+    <Compile Include="..\NHibernate.Cache.DynamicCacheBuster\ChangeEventHandler.cs">
+      <Link>ChangeEventHandler.cs</Link>
     </Compile>
     <Compile Include="..\NHibernate.Cache.DynamicCacheBuster\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
