@@ -5,5 +5,5 @@ using System.Text;
 
 namespace NHibernate.Cache.DynamicCacheBuster
 {
-    public delegate void Logger(string cacheRegionName, string hash);
+    public delegate void ChangeEventHandler(string oldCacheRegionName, string newCacheRegionName, string hash);
 }

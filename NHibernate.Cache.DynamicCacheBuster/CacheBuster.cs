@@ -18,7 +18,7 @@ namespace NHibernate.Cache.DynamicCacheBuster
 
     public class CacheBuster
     {
-        private Logger logger = DefaultLogger;
+        private List<ChangeEventHandler> onChange = new List<ChangeEventHandler>();
         private GetRootClassHashInput getRootClassHashInput = DefaultRootClassSerializer;
         private GetCollectionHashInput getCollectionHashInput = DefaultCollectionSerializer;
 
@@ -28,14 +28,14 @@ namespace NHibernate.Cache.DynamicCacheBuster
         }
 
         /// <summary>
-        /// Set the logger.
+        /// Add a callback used when the region name is changed.
         /// </summary>
-        /// <param name="logger"></param>
+        /// <param name="onChange"></param>
         /// <returns></returns>
-        public CacheBuster WithLogger(Logger logger)
+        public CacheBuster OnChange(ChangeEventHandler onChange)
         {
-            if (logger == null) throw new ArgumentNullException("logger");
-            this.logger = logger;
+            if (onChange == null) throw new ArgumentNullException("onChange");
+            this.onChange.Add(onChange);
             return this;
         }
 
@@ -118,9 +118,11 @@ namespace NHibernate.Cache.DynamicCacheBuster
 
             actionQueue.Enqueue(() =>
             {
-                var cacheRegionName = rootClass.CacheRegionName;
-                logger(cacheRegionName, hash);
-                rootClass.CacheRegionName = cacheRegionName + "(" + hash + ")";
+                var oldCacheRegionName = rootClass.CacheRegionName;
+                var newCacheRegionName = oldCacheRegionName + "(" + hash + ")";
+                onChange.ForEach(x => x(oldCacheRegionName, newCacheRegionName, hash));
+
+                rootClass.CacheRegionName = newCacheRegionName;
             });
         }
 
@@ -134,15 +136,12 @@ namespace NHibernate.Cache.DynamicCacheBuster
 
             actionQueue.Enqueue(() =>
             {
-                var cacheRegionName = collection.CacheRegionName;
-                logger(cacheRegionName, hash);
-                collection.CacheRegionName = cacheRegionName + "(" + hash + ")";
+                var oldCacheRegionName = collection.CacheRegionName;
+                var newCacheRegionName = oldCacheRegionName + "(" + hash + ")";
+                onChange.ForEach(x => x(oldCacheRegionName, newCacheRegionName, hash));
+
+                collection.CacheRegionName = newCacheRegionName;
             });
-        }
-
-        private static void DefaultLogger(string cacheRegionName, string hash)
-        {
-
         }
 
         public static object DefaultRootClassSerializer(RootClass rootClass)

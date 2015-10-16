@@ -30,9 +30,9 @@ namespace NHibernate.Cache.DynamicCacheBuster.Sample
             
             // The magic!
             new CacheBuster() 
-                .WithLogger((cacheRegionName, hash) =>
+                .OnChange((oldCacheRegionName, newCacheRegionName, hash) =>
                 {
-                    Console.WriteLine("Region = {0}\r\n  Hash = {1}\r\n---", cacheRegionName, hash);
+                    Console.WriteLine("Old Region = {0}\nNew Region = {1}\nHash = {2}\n---", oldCacheRegionName, newCacheRegionName, hash);
                 })
                 .AppendVersionToCacheRegionNames(cfg);
 

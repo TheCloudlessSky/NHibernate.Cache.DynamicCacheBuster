@@ -54,7 +54,7 @@
   <ItemGroup>
     <Compile Include="CacheBuster.cs" />
     <Compile Include="GetCollectionHashInput.cs" />
-    <Compile Include="Logger.cs" />
+    <Compile Include="ChangeEventHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="GetRootClassHashInput.cs" />
   </ItemGroup>
