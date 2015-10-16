@@ -76,6 +76,10 @@ key generation for Ruby on Rails.
 
 ## Changelog
 
+**2.0.0**
+- Remove `WithLogging` in favor of `OnChange` to include the old/new region
+  names.
+
 **1.1.1**
 - Change default hash input functions to use type names instead of serializing
   the whole type. 

@@ -4,8 +4,8 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("NHibernate.Cache.DynamicCacheBuster")]
 [assembly: AssemblyDescription("")]
-[assembly: AssemblyVersion("1.1.1.0")]
-[assembly: AssemblyFileVersion("1.1.1.0")]
+[assembly: AssemblyVersion("2.0.0.0")]
+[assembly: AssemblyFileVersion("2.0.0.0")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("http://adrianphinney.com")]
 [assembly: AssemblyProduct("NHibernate.Cache.DynamicCacheBuster")]
