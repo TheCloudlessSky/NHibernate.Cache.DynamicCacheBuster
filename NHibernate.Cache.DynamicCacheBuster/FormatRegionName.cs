@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace NHibernate.Cache.DynamicCacheBuster
 {
-    public delegate void ChangeEventHandler(string oldCacheRegionName, string newCacheRegionName, string version);
+    public delegate string FormatRegionName(string oldRegionName, string version);
 }

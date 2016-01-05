@@ -30,9 +30,9 @@ namespace NHibernate.Cache.DynamicCacheBuster.Sample
             
             // The magic!
             new CacheBuster() 
-                .OnChange((oldCacheRegionName, newCacheRegionName, hash) =>
+                .OnChange((oldCacheRegionName, newCacheRegionName, version) =>
                 {
-                    Console.WriteLine("Old Region = {0}\nNew Region = {1}\nHash = {2}\n---", oldCacheRegionName, newCacheRegionName, hash);
+                    Console.WriteLine($"Old Region = {oldCacheRegionName}\nNew Region = {newCacheRegionName}\nVersion = {version}\n---");
                 })
                 .AppendVersionToCacheRegionNames(cfg);
 
@@ -51,11 +51,11 @@ namespace NHibernate.Cache.DynamicCacheBuster.Sample
                 var blog = session.QueryOver<Blog>().Where(b => b.Name == "My Awesome Blog").SingleOrDefault();
 
                 Console.WriteLine("Blog\n----");
-                Console.WriteLine("Id={0}, Name={1}, Posts={2}", blog.Id, blog.Name, blog.Posts.Count);
+                Console.WriteLine($"Id={blog.Id}, Name={blog.Name}, Posts={blog.Posts.Count}");
 
                 foreach (var post in blog.Posts)
                 {
-                    Console.WriteLine("  - Id={0}, Name={1}, Body={2}", post.Id, post.Name, post.Body);
+                    Console.WriteLine($"  - Id={post.Id}, Name={post.Name}, Body={post.Body}");
                 }
             });
 

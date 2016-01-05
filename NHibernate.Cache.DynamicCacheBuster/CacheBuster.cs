@@ -13,14 +13,13 @@ namespace NHibernate.Cache.DynamicCacheBuster
     using Tuple = System.Tuple;
     using RootClass = NHibernate.Mapping.RootClass;
     using Collection = NHibernate.Mapping.Collection;
-    using Component = NHibernate.Mapping.Component;
-    using IType = NHibernate.Type.IType;
-
+        
     public class CacheBuster
     {
-        private List<ChangeEventHandler> onChange = new List<ChangeEventHandler>();
-        private GetRootClassHashInput getRootClassHashInput = DefaultRootClassSerializer;
-        private GetCollectionHashInput getCollectionHashInput = DefaultCollectionSerializer;
+        private readonly List<ChangeEventHandler> onChanges = new List<ChangeEventHandler>();
+        private FormatRegionName formatRegionName = DefaultFormatRegionName;
+        private GetRootClassHashInput getRootClassHashInput = DefaultRootClassHashInput;
+        private GetCollectionHashInput getCollectionHashInput = DefaultCollectionHashInput;
 
         public CacheBuster()
         {
@@ -28,14 +27,14 @@ namespace NHibernate.Cache.DynamicCacheBuster
         }
 
         /// <summary>
-        /// Add a callback used when the region name is changed.
+        /// Add a callback for when a region name is changed.
         /// </summary>
         /// <param name="onChange"></param>
         /// <returns></returns>
         public CacheBuster OnChange(ChangeEventHandler onChange)
         {
-            if (onChange == null) throw new ArgumentNullException("onChange");
-            this.onChange.Add(onChange);
+            if (onChange == null) throw new ArgumentNullException(nameof(onChange));
+            this.onChanges.Add(onChange);
             return this;
         }
 
@@ -49,7 +48,7 @@ namespace NHibernate.Cache.DynamicCacheBuster
         /// <returns></returns>
         public CacheBuster WithRootClassHashInput(GetRootClassHashInput getHashInput)
         {
-            if (getHashInput == null) throw new ArgumentNullException("getHashInput");
+            if (getHashInput == null) throw new ArgumentNullException(nameof(getHashInput));
             this.getRootClassHashInput = getHashInput;
             return this;
         }
@@ -63,8 +62,21 @@ namespace NHibernate.Cache.DynamicCacheBuster
         /// <returns></returns>
         public CacheBuster WithCollectionHashInput(GetCollectionHashInput getHashInput)
         {
-            if (getHashInput == null) throw new ArgumentNullException("serializer");
+            if (getHashInput == null) throw new ArgumentNullException(nameof(getHashInput));
             this.getCollectionHashInput = getHashInput;
+            return this;
+        }
+        
+        /// <summary>
+        /// Set the formatting used when setting the new region name with the
+        /// computed version.
+        /// </summary>
+        /// <param name="formatRegionName"></param>
+        /// <returns></returns>
+        public CacheBuster WithFormatRegionName(FormatRegionName formatRegionName)
+        {
+            if (formatRegionName == null) throw new ArgumentNullException(nameof(formatRegionName));
+            this.formatRegionName = formatRegionName;
             return this;
         }
 
@@ -119,8 +131,8 @@ namespace NHibernate.Cache.DynamicCacheBuster
             actionQueue.Enqueue(() =>
             {
                 var oldCacheRegionName = rootClass.CacheRegionName;
-                var newCacheRegionName = oldCacheRegionName + "(" + hash + ")";
-                onChange.ForEach(x => x(oldCacheRegionName, newCacheRegionName, hash));
+                var newCacheRegionName = formatRegionName(oldCacheRegionName, hash);
+                onChanges.ForEach(x => x(oldCacheRegionName, newCacheRegionName, hash));
 
                 rootClass.CacheRegionName = newCacheRegionName;
             });
@@ -137,14 +149,31 @@ namespace NHibernate.Cache.DynamicCacheBuster
             actionQueue.Enqueue(() =>
             {
                 var oldCacheRegionName = collection.CacheRegionName;
-                var newCacheRegionName = oldCacheRegionName + "(" + hash + ")";
-                onChange.ForEach(x => x(oldCacheRegionName, newCacheRegionName, hash));
+                var newCacheRegionName = formatRegionName(oldCacheRegionName, hash);
+                onChanges.ForEach(x => x(oldCacheRegionName, newCacheRegionName, hash));
 
                 collection.CacheRegionName = newCacheRegionName;
             });
         }
 
+        [Obsolete("Use DefaultRootClassHashInput() instead.")]
         public static object DefaultRootClassSerializer(RootClass rootClass)
+        {
+            return DefaultRootClassHashInput(rootClass);
+        }
+
+        [Obsolete("Use DefaultCollectionHashInput() instead.")]
+        public static object DefaultCollectionSerializer(Collection collection)
+        {
+            return DefaultCollectionHashInput(collection);
+        }
+
+        private static string DefaultFormatRegionName(string oldRegionName, string version)
+        {
+            return $"{oldRegionName}({version})";
+        }
+
+        public static object DefaultRootClassHashInput(RootClass rootClass)
         {
             // This is the standard enumeration done for the EntityMetamodel
             // constructor to build *all* properties (including properties that
@@ -157,8 +186,8 @@ namespace NHibernate.Cache.DynamicCacheBuster
 
             return serialized;
         }
-
-        public static object DefaultCollectionSerializer(Collection collection)
+        
+        public static object DefaultCollectionHashInput(Collection collection)
         {
             var serialized = Tuple.Create(collection.Role, collection.CollectionType.ToString(), collection.Element.Type.ToString());
             return serialized;

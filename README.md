@@ -76,6 +76,9 @@ key generation for Ruby on Rails.
 
 ## Changelog
 
+**2.1.0**
+- Add `WithFormatRegionName` to customize the formatting of the new region name.
+
 **2.0.0**
 - Remove `WithLogging` in favor of `OnChange` to include the old/new region
   names.

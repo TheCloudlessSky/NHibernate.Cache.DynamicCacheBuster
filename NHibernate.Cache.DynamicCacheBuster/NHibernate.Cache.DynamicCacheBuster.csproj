@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CacheBuster.cs" />
+    <Compile Include="FormatRegionName.cs" />
     <Compile Include="GetCollectionHashInput.cs" />
     <Compile Include="ChangeEventHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
