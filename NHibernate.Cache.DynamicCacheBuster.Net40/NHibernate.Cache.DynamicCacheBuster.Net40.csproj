@@ -62,6 +62,9 @@
     <Compile Include="..\NHibernate.Cache.DynamicCacheBuster\ChangeEventHandler.cs">
       <Link>ChangeEventHandler.cs</Link>
     </Compile>
+    <Compile Include="..\NHibernate.Cache.DynamicCacheBuster\FormatRegionName.cs">
+      <Link>FormatRegionName.cs</Link>
+    </Compile>
     <Compile Include="..\NHibernate.Cache.DynamicCacheBuster\GetCollectionHashInput.cs">
       <Link>GetCollectionHashInput.cs</Link>
     </Compile>
